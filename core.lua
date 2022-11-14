@@ -60,6 +60,7 @@ local CLASS_ARMOR_TYPES = {
 	MAGE        = LOCALIZED_CLOTH,
 	WARLOCK     = LOCALIZED_CLOTH,
 	PRIEST      = LOCALIZED_CLOTH,
+	EVOKER      = LOCALIZED_MAIL,
 };
 
 local ARMOR_TYPE_LEVEL = {
@@ -339,7 +340,7 @@ function Addon:OnEnable()
 	self:RegisterEvent("MERCHANT_SHOW");
 	self:RegisterEvent("MERCHANT_CLOSED");
 	self:RegisterEvent("MERCHANT_UPDATE");
-	self:RegisterEvent("CURSOR_UPDATE");
+	self:RegisterEvent("CURSOR_CHANGED");
 	self:RegisterEvent("UPDATE_INVENTORY_DURABILITY");
 	self:RegisterEvent("TRANSMOG_COLLECTION_UPDATED");
 	
@@ -461,7 +462,7 @@ function Addon:ITEM_UNLOCKED()
 	Addon:UnregisterEvent("ITEM_UNLOCKED");
 end
 
-function Addon:CURSOR_UPDATE()
+function Addon:CURSOR_CHANGED()
 	if(CursorHasItem()) then return end
 	Addon:ToggleCursorHighlights(false);
 end
@@ -1874,6 +1875,10 @@ function Addon:UpdateMerchantInfo()
 							rarityBorder:Show();
 						elseif(Addon:IsCurrencyItem(itemLink)) then
 							local rarity = select(9, Addon:GetCurrencyInfo(itemLink));
+							if not rarity then
+								local temp = select(2, Addon:GetCurrencyInfo(itemLink));
+								rarity = temp.quality;
+							end
 							local r, g, b = GetItemQualityColor(rarity);
 							local a = 0.9;
 							if(rarity == 1) then a = 0.75 end
